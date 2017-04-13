@@ -1,7 +1,7 @@
 /*!
  * ui-select
  * http://github.com/angular-ui/ui-select
- * Version: 0.19.4 - 2017-03-16T09:46:17.126Z
+ * Version: 0.19.4 - 2017-04-13T13:29:48.555Z
  * License: MIT
  */
 
@@ -457,6 +457,9 @@ uis.controller('uiSelectCtrl',
 
   ctrl.focusSearchInput = function () {
     ctrl.searchInput[0].focus();
+    if (ctrl.focusser) {
+      ctrl.focusser.trigger('blur'); // in all browsers but IE the focus causes a blur, for IEs sake force a blur
+    }
     $scope.$broadcast('uis:activate');
   };
 
