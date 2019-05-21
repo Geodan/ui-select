@@ -62,12 +62,6 @@ uis.directive('uiSelectMultiple', ['uiSelectMinErr','$timeout', function(uiSelec
         return true;
       };
 
-      ctrl.getPlaceholder = function(){
-        //Refactor single?
-        if($select.selected && $select.selected.length) return;
-        return $select.placeholder;
-      };
-
 
     }],
     controllerAs: '$selectMultiple',
@@ -162,7 +156,7 @@ uis.directive('uiSelectMultiple', ['uiSelectMinErr','$timeout', function(uiSelec
         // Make sure that model value is array
         if(!angular.isArray(ngModel.$viewValue)){
           // Have tolerance for null or undefined values
-          if(angular.isUndefined(ngModel.$viewValue) || ngModel.$viewValue === null){
+          if (isNil(ngModel.$viewValue)){
             ngModel.$viewValue = [];
           } else {
             throw uiSelectMinErr('multiarr', "Expected model value to be array but got '{0}'", ngModel.$viewValue);
@@ -178,6 +172,15 @@ uis.directive('uiSelectMultiple', ['uiSelectMinErr','$timeout', function(uiSelec
           return;
         }
         $select.selected.push(item);
+        var locals = {};
+        locals[$select.parserResult.itemName] = item;
+
+        $timeout(function(){
+          $select.onSelectCallback(scope, {
+            $item: item,
+            $model: $select.parserResult.modelMapper(scope, locals)
+          });
+        });
         $selectMultiple.updateModel();
       });
 
@@ -252,11 +255,11 @@ uis.directive('uiSelectMultiple', ['uiSelectMinErr','$timeout', function(uiSelec
                 } else {
                   return curr;
                 }
-                
+
               } else {
                 // If nothing yet selected, select last item
-                return last;  
-              }              
+                return last;
+              }
               break;
             case KEY.DELETE:
               // Remove selected item and select next item
